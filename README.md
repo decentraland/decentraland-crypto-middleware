@@ -4,6 +4,16 @@
 
 A multi framework middleware to authenticate request signed with `@decentraland/SignedFetch`
 
+## Index
+
+- [Install](#install)
+- [Use with Express](#use-with-express)
+- [Use with Koa](#use-with-koa)
+- [Use with Well Known Components](#use-with-well-known-components)
+- [Use with PassportJS](#use-with-passportjs)
+- [Options](#options)
+- [Develop](#develop)
+
 ## Install
 
 ```bash
@@ -114,3 +124,11 @@ app.get(
 | `expiration` | `number`                                       | time in milliseconds where a signature is considered valid (default: `60_000`)                               |
 | `catalyst`   | `string`                                       | catalyst url to validate contract wallet signatures (default: `https://peer-lb.decentraland.org/`)           |
 | `onError`    | `(err: Error & { statusCode: number }) => any` | formats the response body when an error occurred (default: `(err) => ({ ok: false, message: err.message })`) |
+
+## Develop
+
+If you want to contribute make you will need to setup `husky` otherwise your commit may fail because is not following the format standard
+
+```bash
+  npm run husky-setup
+```
