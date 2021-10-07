@@ -1,7 +1,11 @@
 node_modules
 coverage/*
 src/*
+lib/**/*.test.d.ts
+lib/**/*.test.js
 tsconfig.json
 .github
 .vscode
-test
+.husky
+.prettierignore
+.prettier
