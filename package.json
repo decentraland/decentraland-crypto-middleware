@@ -21,7 +21,6 @@
     }
   },
   "release": {
-    "ci": false,
     "branches": ["main"]
   },
   "repository": {
