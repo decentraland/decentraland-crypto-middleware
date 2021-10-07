@@ -23,7 +23,7 @@ export function express(options: Options) {
         next(null)
       })
       .catch((err) => {
-        if (!options.optinal) {
+        if (!options.optional) {
           const status = err.statusCode || err.status || 500
           const onError = options.onError ?? DEFAULT_ERROR_FORMAT
           res.status(status).send(onError(err))
@@ -43,7 +43,7 @@ export function koa(options: Options): k.Middleware {
       const data = await verify(ctx.method, ctx.path, ctx.headers, options)
       Object.assign(ctx, data)
     } catch (err) {
-      if (!options.optinal) {
+      if (!options.optional) {
         const status = err.statusCode || err.status || 500
         const onError = options.onError ?? DEFAULT_ERROR_FORMAT
         ctx.status = status
@@ -81,7 +81,7 @@ export function wellKnownComponents(
       )
       Object.assign(ctx, data)
     } catch (err) {
-      if (!options.optinal) {
+      if (!options.optional) {
         const onError = options.onError ?? DEFAULT_ERROR_FORMAT
         const status = err.statusCode || err.status || 500
         return { status, body: onError(err) }

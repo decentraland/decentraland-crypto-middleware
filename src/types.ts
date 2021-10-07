@@ -22,7 +22,7 @@ export type VerifyAuthChainHeadersOptions = {
 }
 
 export type SessionOptions = {
-  optinal?: boolean
+  optional?: boolean
   onError?: (err: RequestError) => any
 }
 
