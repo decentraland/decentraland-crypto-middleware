@@ -65,7 +65,6 @@ export function passport(defaultOptions: VerifyAuthChainHeadersOptions) {
 
 /**
  * Well Known Components
- * @todo
  */
 export function wellKnownComponents(
   options: Options
