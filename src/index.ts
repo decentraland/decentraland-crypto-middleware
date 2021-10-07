@@ -69,7 +69,10 @@ export function passport(defaultOptions: VerifyAuthChainHeadersOptions) {
 export function wellKnownComponents(
   options: Options
 ): w.IHttpServerComponent.IRequestHandler<
-  w.IHttpServerComponent.PathAwareContext<{}, string>
+  w.IHttpServerComponent.PathAwareContext<
+    { verification?: DecentralandSignatureData },
+    string
+  >
 > {
   return async (ctx, next) => {
     try {
@@ -79,7 +82,8 @@ export function wellKnownComponents(
         ctx.request.headers.raw(),
         options
       )
-      Object.assign(ctx, data)
+
+      ctx.verification = data
     } catch (err) {
       if (!options.optional) {
         const onError = options.onError ?? DEFAULT_ERROR_FORMAT

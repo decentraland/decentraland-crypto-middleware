@@ -21,7 +21,7 @@ export class DecentralandStrategy extends Strategy {
         this.pass()
       })
       .catch((err: RequestError) => {
-        if (!options.optinal) {
+        if (!options.optional) {
           this.fail(err.message, err.statusCode)
         } else {
           this.pass()

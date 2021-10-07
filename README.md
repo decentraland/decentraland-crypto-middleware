@@ -45,8 +45,8 @@ app.get(
   '/user/required',
   dcl.koa(),
   (ctx: Context & dcl.DecentralandSignatureData) => {
-    const address: string = req.auth
-    const metadata: Record<string, any> = req.authMetadata
+    const address: string = ctx.auth
+    const metadata: Record<string, any> = ctx.authMetadata
   }
 )
 
@@ -54,8 +54,8 @@ app.get(
   '/user/optional',
   dcl.koa({ optional: true }),
   (ctx: Context & dcl.DecentralandSignatureData) => {
-    const address: string | undefined = req.auth
-    const metadata: Record<string, any> | undefined = req.authMetadata
+    const address: string | undefined = ctx.auth
+    const metadata: Record<string, any> | undefined = ctx.authMetadata
   }
 )
 ```
@@ -67,15 +67,15 @@ import type { IHttpServerComponent } from '@well-known-components/interfaces'
 import * as dcl from 'decentraland-crypto-middleware'
 
 app.use('/user/required', dcl.wellKnownComponents())
-app.get('/user/required', (ctx: IHttpServerComponent.IRequestHandler<dcl.DecentralandSignatureData<{}>>) => {
-  const address: string = req.auth
-  const metadata: Record<string, any> = req.authMetadata
+app.get('/user/required', (ctx: { verification: dcl.DecentralandSignatureData<{}> }) => {
+  const address: string = ctx.verification.auth
+  const metadata: Record<string, any> = ctx.verification.authMetadata
 })
 
 app.use('/user/optional', dcl.wellKnownComponents({ optional: true })
-app.get('/user/optional', (ctx: IHttpServerComponent.IRequestHandler<dcl.DecentralandSignatureData<{}>>) => {
-  const address: string | undefined= req.auth
-  const metadata: Record<string, any> | undefined = req.authMetadata
+app.get('/user/optional', (ctx: { verification?: Partial<dcl.DecentralandSignatureData<{}>> }) => {
+  const address: string | undefined= ctx.verification?.auth
+  const metadata: Record<string, any> | undefined = ctx.verification?.authMetadata
 })
 ```
 
