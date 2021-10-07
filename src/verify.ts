@@ -150,7 +150,7 @@ export default async function verify<P extends {} = {}>(
     headers[AUTH_TIMESTAMP_HEADER],
     headers[AUTH_METADATA_HEADER],
   ]
-    .join(',')
+    .join(':')
     .toLowerCase()
   if (isEIP1664AuthChain(authChain)) {
     ownerAddress = await verifyEIP1654Sign(authChain, payload, options)

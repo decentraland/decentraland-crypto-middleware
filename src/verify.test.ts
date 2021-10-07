@@ -138,7 +138,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const method = 'get'
       const path = '/path/to/resource'
       const payload = [method, path, timestamp, JSON.stringify(metadata)]
-        .join(',')
+        .join(':')
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, metadata)
@@ -161,7 +161,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const method = 'get'
       const path = '/path/to/resource'
       const payload = [method, path, timestamp, JSON.stringify(metadata)]
-        .join(',')
+        .join(':')
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, metadata)
@@ -178,7 +178,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const method = 'get'
       const path = '/path/to/resource'
       const payload = [method, path, timestamp, JSON.stringify(metadata)]
-        .join(',')
+        .join(':')
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, metadata)
@@ -195,7 +195,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const method = 'get'
       const path = '/path/to/resource'
       const payload = [method, path, timestamp, JSON.stringify(metadata)]
-        .join(',')
+        .join(':')
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, metadata)
@@ -211,7 +211,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const method = 'get'
       const path = '/path/to/resource'
       const payload = [method, path, timestamp, JSON.stringify(metadata)]
-        .join(',')
+        .join(':')
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, metadata)
@@ -227,7 +227,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const method = 'get'
       const path = '/path/to/resource'
       const payload = [method, path, timestamp, JSON.stringify(metadata)]
-        .join(',')
+        .join(':')
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp + 1, metadata)
@@ -243,7 +243,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const method = 'get'
       const path = '/path/to/resource'
       const payload = [method, path, timestamp, JSON.stringify(metadata)]
-        .join(',')
+        .join(':')
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, metadata)
@@ -260,7 +260,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const method = 'get'
       const path = '/path/to/resource'
       const payload = [method, path, timestamp, JSON.stringify(metadata)]
-        .join(',')
+        .join(':')
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, {
