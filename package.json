@@ -1,0 +1,65 @@
+{
+  "name": "decentraland-crypto-middleware",
+  "version": "0.0.0-development",
+  "description": "Decentraland Authentication Middleware",
+  "main": "./lib",
+  "scripts": {
+    "test": "jest",
+    "build": "rm -rf lib && tsc -p . -outDir lib --sourceMap false --skipLibCheck",
+    "format": "prettier --write '**/*.{ts,js,json,md}'",
+    "semantic-release": "semantic-release",
+    "husky-setup": "husky install",
+    "precommit": "lint-staged --config .husky/pre-commit.js"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "roots": [
+      "<rootDir>/src/"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|sass|scss|gif|ttf|eot|svg)$": "<rootDir>/src/__mocks__/files.ts"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/decentraland-crypto-middleware.git"
+  },
+  "keywords": [
+    "express",
+    "koa",
+    "passport",
+    "connect",
+    "middleware",
+    "well-known-components"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/decentraland/decentraland-crypto-middleware/issues"
+  },
+  "homepage": "https://github.com/decentraland/decentraland-crypto-middleware#readme",
+  "dependencies": {
+    "dcl-crypto": "^2.3.0",
+    "express": "^4.17.1",
+    "isomorphic-fetch": "^3.0.0",
+    "koa": "^2.13.3",
+    "passport-strategy": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/isomorphic-fetch": "0.0.35",
+    "@types/jest": "^27.0.2",
+    "@types/koa": "^2.13.4",
+    "@types/passport-strategy": "^0.2.35",
+    "husky": "^7.0.2",
+    "jest": "^27.2.4",
+    "lint-staged": "^11.2.0",
+    "prettier": "^2.4.1",
+    "semantic-release": "^18.0.0",
+    "ts-jest": "^27.0.5",
+    "ts-loader": "^9.2.6",
+    "ts-node": "^10.2.1",
+    "tsc-files": "^1.1.2",
+    "typescript": "^4.4.3"
+  }
+}

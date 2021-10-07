@@ -1,0 +1,36 @@
+name: Testing
+
+on:
+  push:
+    branches:
+      - next
+      - feat/*
+      - fix/*
+
+jobs:
+  release_alpha:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: node.js 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+
+      - name: installing
+        run: npm ci
+
+      - name: linters
+        uses: wearerequired/lint-action@v1
+        with:
+          prettier: true
+          prettier_extensions: ts,js,json,md
+
+      - name: testing
+        run: npm test
+
+      - name: building
+        run: npm run build

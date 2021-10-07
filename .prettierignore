@@ -1,0 +1,10 @@
+.cache
+.github
+.vscode
+.husky
+package.json
+package-lock.json
+build
+public
+dist
+node_modules

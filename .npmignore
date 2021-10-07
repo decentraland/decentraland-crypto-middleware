@@ -1,0 +1,7 @@
+node_modules
+coverage/*
+src/*
+tsconfig.json
+.github
+.vscode
+test
