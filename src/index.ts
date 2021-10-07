@@ -1,5 +1,6 @@
 import type * as e from 'express'
 import type * as k from 'koa'
+import type * as w from '@well-known-components/interfaces'
 import type {
   Options,
   VerifyAuthChainHeadersOptions,
@@ -46,14 +47,35 @@ export function koa(options: Options): k.Middleware {
 /**
  * Passport Strategy
  */
-export function passport(options: VerifyAuthChainHeadersOptions) {
-  return new DecentralandStrategy(options)
+export function passport(defaultOptions: VerifyAuthChainHeadersOptions) {
+  return new DecentralandStrategy(defaultOptions)
 }
 
 /**
  * Well Known Components
  * @todo
  */
-export function wellKnownComponents(options: Options) {
-  return () => {}
+export function wellKnownComponents(
+  options: Options
+): w.IHttpServerComponent.IRequestHandler<
+  w.IHttpServerComponent.PathAwareContext<{}, string>
+> {
+  return async (ctx, next) => {
+    try {
+      const data = await verify(
+        ctx.request.method,
+        ctx.url.pathname,
+        ctx.request.headers.raw(),
+        options
+      )
+      Object.assign(ctx, data)
+    } catch (err) {
+      if (!options.optinal) {
+        err.status = err.statusCode || err.status || 500
+        throw err
+      }
+    }
+
+    return next()
+  }
 }

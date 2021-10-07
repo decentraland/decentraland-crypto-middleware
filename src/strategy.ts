@@ -1,18 +1,21 @@
 import type { Request } from 'express'
 import { Strategy } from 'passport-strategy'
 import RequestError from './errors'
-import { SessionOptions, VerifyAuthChainHeadersOptions } from './types'
+import { Options } from './types'
 import verify from './verify'
 
 export class DecentralandStrategy extends Strategy {
   name = 'decentraland'
 
-  constructor(private options: VerifyAuthChainHeadersOptions) {
+  constructor(private options: Options = {}) {
     super()
   }
 
-  authenticate(req: Request, options: SessionOptions) {
-    verify(req.method, req.baseUrl + req.path, req.headers, this.options)
+  authenticate(req: Request, options: Options) {
+    verify(req.method, req.baseUrl + req.path, req.headers, {
+      ...this.options,
+      ...options,
+    })
       .then((data) => {
         Object.assign(req, data)
         this.pass()

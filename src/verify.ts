@@ -32,13 +32,11 @@ export function extractAuthChain(
   let chain: AuthChain = []
   while (headers[AUTH_CHAIN_HEADER_PREFIX + index]) {
     try {
-      if (typeof headers[AUTH_CHAIN_HEADER_PREFIX + index] === 'string') {
-        chain.push(
-          JSON.parse(headers[AUTH_CHAIN_HEADER_PREFIX + index] as string)
-        )
-      } else {
-        throw new RequestError(`Invalid chain format`, 400)
-      }
+      const item = Array.isArray(headers[AUTH_CHAIN_HEADER_PREFIX + index])
+        ? (headers[AUTH_CHAIN_HEADER_PREFIX + index] as string[])[0]
+        : (headers[AUTH_CHAIN_HEADER_PREFIX + index] as string)
+
+      chain.push(JSON.parse(item))
     } catch (err) {
       throw new RequestError(`Invalid chain format: ${err.message}`, 400)
     }
@@ -158,6 +156,10 @@ export default async function verify<P extends {} = {}>(
     ownerAddress = await verifyEIP1654Sign(authChain, payload, options)
   } else {
     ownerAddress = await verifyPersonalSign(authChain, payload)
+  }
+
+  if (timestamp > Date.now()) {
+    throw new RequestError(`Invalid signature timestamp`, 401)
   }
 
   const expiration = options.expiration ?? DEFAULT_EXPIRATION

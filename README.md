@@ -17,11 +17,20 @@ import { Request } from 'express'
 import * as dcl from 'decentraland-crypto-middleware'
 
 app.get(
-  '/user/data',
+  '/user/required',
   dcl.express(),
   (req: Request & dcl.DecentralandSignatureData) => {
-    const address = req.auth
-    const metadata = req.authMetadata
+    const address: string = req.auth
+    const metadata: Record<string, any> = req.authMetadata
+  }
+)
+
+app.get(
+  '/user/optional',
+  dcl.express({ optional: true }),
+  (req: Request & dcl.DecentralandSignatureData) => {
+    const address: string | undefined = req.auth
+    const metadata: Record<string, any> | undefined = req.authMetadata
   }
 )
 ```
@@ -33,13 +42,41 @@ import { Context } from 'koa'
 import * as dcl from 'decentraland-crypto-middleware'
 
 app.get(
-  '/user/data',
+  '/user/required',
   dcl.koa(),
   (ctx: Context & dcl.DecentralandSignatureData) => {
-    const address = ctx.auth
-    const metadata = ctx.authMetadata
+    const address: string = req.auth
+    const metadata: Record<string, any> = req.authMetadata
   }
 )
+
+app.get(
+  '/user/optional',
+  dcl.koa({ optional: true }),
+  (ctx: Context & dcl.DecentralandSignatureData) => {
+    const address: string | undefined = req.auth
+    const metadata: Record<string, any> | undefined = req.authMetadata
+  }
+)
+```
+
+## Use with [Well Known Components](https://github.com/well-known-components)
+
+```typescript
+import type { IHttpServerComponent } from '@well-known-components/interfaces'
+import * as dcl from 'decentraland-crypto-middleware'
+
+app.use('/user/required', dcl.wellKnownComponents())
+app.get('/user/required', (ctx: IHttpServerComponent.IRequestHandler<dcl.DecentralandSignatureData<{}>>) => {
+  const address: string = req.auth
+  const metadata: Record<string, any> = req.authMetadata
+})
+
+app.use('/user/optional', dcl.wellKnownComponents({ optional: true })
+app.get('/user/optional', (ctx: IHttpServerComponent.IRequestHandler<dcl.DecentralandSignatureData<{}>>) => {
+  const address: string | undefined= req.auth
+  const metadata: Record<string, any> | undefined = req.authMetadata
+})
 ```
 
 ## Use with [PassportJS](http://www.passportjs.org/)
@@ -51,15 +88,28 @@ import * as dcl from 'decentraland-crypto-middleware'
 passport.use(dcl.passport())
 
 app.get(
-  '/user/data',
+  '/user/required',
   passport.authenticate('decentraland'),
   (req: Request & dcl.DecentralandSignatureData) => {
-    const address = req.auth
-    const metadata = req.authMetadata
+    const address: string = req.auth
+    const metadata: Record<string, any> = req.authMetadata
+  }
+)
+
+app.get(
+  '/user/required',
+  passport.authenticate('decentraland', { optional: true }),
+  (req: Request & dcl.DecentralandSignatureData) => {
+    const address: string | undefined = req.auth
+    const metadata: Record<string, any> | undefined = req.authMetadata
   }
 )
 ```
 
-## Use with [Well Known Components](https://github.com/well-known-components)
+## Options
 
-// TODO
+| `name`       | `type`    | `description`                                                                                      |
+| ------------ | --------- | -------------------------------------------------------------------------------------------------- |
+| `optional`   | `boolean` | if `false` request will fail if there is no signature or if is invalid (default: `false`)          |
+| `expiration` | `number`  | time in milliseconds where a signature is considered valid (default: `60_000`)                     |
+| `catalyst`   | `string`  | catalyst url to validate contract wallet signatures (default: `https://peer-lb.decentraland.org/`) |

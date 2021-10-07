@@ -189,6 +189,22 @@ describe(`src/verifyAuthChainHeaders`, () => {
       ).rejects.toThrowError('Invalid chain timestamp:')
     })
 
+    test(`should throw an error if timestamp is in the future`, async () => {
+      const timestamp = Date.now() + 60000
+      const metadata = {}
+      const method = 'get'
+      const path = '/path/to/resource'
+      const payload = [method, path, timestamp, JSON.stringify(metadata)]
+        .join(',')
+        .toLowerCase()
+      const chain = Authenticator.signPayload(identity, payload)
+      const headers = createAuthChainHeaders(chain, timestamp, metadata)
+
+      await expect(() =>
+        verifyAuthChainHeaders(method, path, headers)
+      ).rejects.toThrowError('Invalid signature timestamp')
+    })
+
     test(`should throw an error if timestamp is expired`, async () => {
       const timestamp = 0
       const metadata = {}

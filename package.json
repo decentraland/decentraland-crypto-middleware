@@ -40,9 +40,7 @@
   "homepage": "https://github.com/decentraland/decentraland-crypto-middleware#readme",
   "dependencies": {
     "dcl-crypto": "^2.3.0",
-    "express": "^4.17.1",
     "isomorphic-fetch": "^3.0.0",
-    "koa": "^2.13.3",
     "passport-strategy": "^1.0.0"
   },
   "devDependencies": {
@@ -51,8 +49,11 @@
     "@types/jest": "^27.0.2",
     "@types/koa": "^2.13.4",
     "@types/passport-strategy": "^0.2.35",
+    "@well-known-components/interfaces": "^1.1.0",
+    "express": "^4.17.1",
     "husky": "^7.0.2",
     "jest": "^27.2.4",
+    "koa": "^2.13.3",
     "lint-staged": "^11.2.0",
     "prettier": "^2.4.1",
     "semantic-release": "^18.0.0",
