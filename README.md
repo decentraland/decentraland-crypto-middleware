@@ -108,8 +108,9 @@ app.get(
 
 ## Options
 
-| `name`       | `type`    | `description`                                                                                      |
-| ------------ | --------- | -------------------------------------------------------------------------------------------------- |
-| `optional`   | `boolean` | if `false` request will fail if there is no signature or if is invalid (default: `false`)          |
-| `expiration` | `number`  | time in milliseconds where a signature is considered valid (default: `60_000`)                     |
-| `catalyst`   | `string`  | catalyst url to validate contract wallet signatures (default: `https://peer-lb.decentraland.org/`) |
+| `name`       | `type`                                         | `description`                                                                                                |
+| ------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `optional`   | `boolean`                                      | if `false` request will fail if there is no signature or if is invalid (default: `false`)                    |
+| `expiration` | `number`                                       | time in milliseconds where a signature is considered valid (default: `60_000`)                               |
+| `catalyst`   | `string`                                       | catalyst url to validate contract wallet signatures (default: `https://peer-lb.decentraland.org/`)           |
+| `onError`    | `(err: Error & { statusCode: number }) => any` | formats the response body when an error occurred (default: `(err) => ({ ok: false, message: err.message })`) |

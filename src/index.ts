@@ -1,10 +1,11 @@
 import type * as e from 'express'
 import type * as k from 'koa'
 import type * as w from '@well-known-components/interfaces'
-import type {
+import {
   Options,
   VerifyAuthChainHeadersOptions,
   DecentralandSignatureData,
+  DEFAULT_ERROR_FORMAT,
 } from './types'
 import { DecentralandStrategy } from './strategy'
 import verify from './verify'
@@ -15,13 +16,21 @@ export { Options, DecentralandSignatureData }
  * Express middleware
  */
 export function express(options: Options) {
-  return (req: e.Request, _res: e.Response, next: e.NextFunction) => {
+  return (req: e.Request, res: e.Response, next: e.NextFunction) => {
     verify(req.method, req.baseUrl + req.path, req.headers, options)
       .then((data) => {
         Object.assign(req, data)
         next(null)
       })
-      .catch((err) => next(!options.optinal ? err : null))
+      .catch((err) => {
+        if (!options.optinal) {
+          const status = err.statusCode || err.status || 500
+          const onError = options.onError ?? DEFAULT_ERROR_FORMAT
+          res.status(status).send(onError(err))
+        } else {
+          next(null)
+        }
+      })
   }
 }
 
@@ -35,8 +44,11 @@ export function koa(options: Options): k.Middleware {
       Object.assign(ctx, data)
     } catch (err) {
       if (!options.optinal) {
-        err.status = err.statusCode || err.status || 500
-        throw err
+        const status = err.statusCode || err.status || 500
+        const onError = options.onError ?? DEFAULT_ERROR_FORMAT
+        ctx.status = status
+        ctx.body = onError(err)
+        return
       }
     }
 
@@ -71,8 +83,9 @@ export function wellKnownComponents(
       Object.assign(ctx, data)
     } catch (err) {
       if (!options.optinal) {
-        err.status = err.statusCode || err.status || 500
-        throw err
+        const onError = options.onError ?? DEFAULT_ERROR_FORMAT
+        const status = err.statusCode || err.status || 500
+        return { status, body: onError(err) }
       }
     }
 
