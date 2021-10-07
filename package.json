@@ -20,6 +20,10 @@
       "\\.(css|less|sass|scss|gif|ttf|eot|svg)$": "<rootDir>/src/__mocks__/files.ts"
     }
   },
+  "release": {
+    "ci": false,
+    "branches": ["main"]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/decentraland/decentraland-crypto-middleware.git"
