@@ -118,46 +118,39 @@ export async function verifyEIP1654Sign(
   return ownerAddress
 }
 
-export default async function verify<P extends {} = {}>(
-  method: string,
-  path: string,
-  headers: Record<string, string | string[] | undefined>,
-  options: VerifyAuthChainHeadersOptions = {}
-): Promise<DecentralandSignatureData<P>> {
-  let authChain = extractAuthChain(headers)
-  const timestamp = Number(headers[AUTH_TIMESTAMP_HEADER] || '0')
-  if (headers[AUTH_TIMESTAMP_HEADER] && !Number.isFinite(timestamp)) {
-    throw new RequestError(
-      `Invalid chain timestamp: ${headers[AUTH_TIMESTAMP_HEADER]}`,
-      400
-    )
-  }
-
-  let metadata: any
-  try {
-    metadata = JSON.parse(String(headers[AUTH_METADATA_HEADER]) || '{}')
-  } catch (err) {
-    throw new RequestError(
-      `Invalid chain metadata: "${headers[AUTH_METADATA_HEADER]}"`,
-      400
-    )
-  }
-
-  let ownerAddress: string
-  const payload = [
-    method,
-    path,
-    headers[AUTH_TIMESTAMP_HEADER],
-    headers[AUTH_METADATA_HEADER],
-  ]
-    .join(':')
-    .toLowerCase()
+export function verifySign(
+  authChain: AuthChain,
+  payload: string,
+  options: Pick<VerifyAuthChainHeadersOptions, 'catalyst'> = {}
+) {
   if (isEIP1664AuthChain(authChain)) {
-    ownerAddress = await verifyEIP1654Sign(authChain, payload, options)
-  } else {
-    ownerAddress = await verifyPersonalSign(authChain, payload)
+    return verifyEIP1654Sign(authChain, payload, options)
   }
 
+  return verifyPersonalSign(authChain, payload)
+}
+
+export function verifyTimestamp(value?: string | string[]) {
+  const timestamp = Number(value || '0')
+  if (value && !Number.isFinite(timestamp)) {
+    throw new RequestError(`Invalid chain timestamp: ${value}`, 400)
+  }
+
+  return timestamp
+}
+
+export function verifyMetadata(value?: string | string[]): Record<string, any> {
+  try {
+    return JSON.parse(value ? String(value) : '{}')
+  } catch (err) {
+    throw new RequestError(`Invalid chain metadata: "${value}"`, 400)
+  }
+}
+
+export function verifyExpiration(
+  timestamp: number,
+  options: VerifyAuthChainHeadersOptions = {}
+) {
   if (timestamp > Date.now()) {
     throw new RequestError(`Invalid signature timestamp`, 401)
   }
@@ -167,8 +160,39 @@ export default async function verify<P extends {} = {}>(
     throw new RequestError(`Expired signature`, 401)
   }
 
+  return true
+}
+
+export function createPayload(
+  method: string,
+  path: string,
+  rawTimestamp: string | string[] | undefined,
+  rawMetadata: string | string[] | undefined
+) {
+  return [method, path, rawTimestamp, rawMetadata].join(':').toLowerCase()
+}
+
+export default async function verify<P extends {} = {}>(
+  method: string,
+  path: string,
+  headers: Record<string, string | string[] | undefined>,
+  options: VerifyAuthChainHeadersOptions = {}
+): Promise<DecentralandSignatureData<P>> {
+  const authChain = extractAuthChain(headers)
+  const timestamp = verifyTimestamp(headers[AUTH_TIMESTAMP_HEADER])
+  const metadata = verifyMetadata(headers[AUTH_METADATA_HEADER])
+
+  const payload = createPayload(
+    method,
+    path,
+    headers[AUTH_TIMESTAMP_HEADER],
+    headers[AUTH_METADATA_HEADER]
+  )
+  const ownerAddress = await verifySign(authChain, payload, options)
+  await verifyExpiration(timestamp)
+
   return {
     auth: ownerAddress,
-    authMetadata: metadata,
+    authMetadata: metadata as P,
   }
 }
