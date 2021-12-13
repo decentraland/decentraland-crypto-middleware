@@ -1,5 +1,6 @@
 node_modules
 coverage/*
+bin/*
 src/*
 lib/**/*.test.d.ts
 lib/**/*.test.js
