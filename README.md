@@ -12,6 +12,7 @@ A multi framework middleware to authenticate request signed with `@decentraland/
 - [Use with Well Known Components](#use-with-well-known-components)
 - [Use with PassportJS](#use-with-passportjs)
 - [Options](#options)
+- [Auth Chain Generator](#auth-chain-generator)
 - [Develop](#develop)
 
 ## Install
@@ -124,6 +125,10 @@ app.get(
 | `expiration` | `number`                                       | time in milliseconds where a signature is considered valid (default: `60_000`)                               |
 | `catalyst`   | `string`                                       | catalyst url to validate contract wallet signatures (default: `https://peer-lb.decentraland.org/`)           |
 | `onError`    | `(err: Error & { statusCode: number }) => any` | formats the response body when an error occurred (default: `(err) => ({ ok: false, message: err.message })`) |
+
+### Auth Chain Generator
+
+If you want to simulate signed headers you can use the [`Auth Chain Generator`](https://git.io/Jimns)
 
 ## Develop
 
