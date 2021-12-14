@@ -151,10 +151,6 @@ export function verifyExpiration(
   timestamp: number,
   options: VerifyAuthChainHeadersOptions = {}
 ) {
-  if (timestamp > Date.now()) {
-    throw new RequestError(`Invalid signature timestamp`, 401)
-  }
-
   const expiration = options.expiration ?? DEFAULT_EXPIRATION
   if (timestamp + expiration < Date.now()) {
     throw new RequestError(`Expired signature`, 401)
