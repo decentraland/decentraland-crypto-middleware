@@ -105,7 +105,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       ).rejects.toThrowError('Error connecting to catalyst')
     })
 
-    test(`should throw an error if catalyst `, async () => {
+    test(`should throw an error if catalyst retrieves and invalid response`, async () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
       await expect(() =>
