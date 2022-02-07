@@ -3,6 +3,10 @@
   "version": "0.0.0-development",
   "description": "Decentraland Authentication Middleware",
   "main": "./lib",
+  "engines": {
+    "node": ">=14",
+    "npm": ">=7"
+  },
   "scripts": {
     "test": "jest",
     "build": "rm -rf lib && tsc -p . -outDir lib --sourceMap false --skipLibCheck",
