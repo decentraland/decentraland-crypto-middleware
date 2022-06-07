@@ -6,11 +6,18 @@ import {
   VerifyAuthChainHeadersOptions,
   DecentralandSignatureData,
   DEFAULT_ERROR_FORMAT,
+  DecentralandSignatureContext,
+  DecentralandSignatureRequiredContext,
 } from './types'
 import { DecentralandStrategy } from './strategy'
 import verify from './verify'
 
-export { Options, DecentralandSignatureData }
+export {
+  Options,
+  DecentralandSignatureData,
+  DecentralandSignatureContext,
+  DecentralandSignatureRequiredContext,
+}
 
 /**
  * Express middleware
@@ -69,10 +76,7 @@ export function passport(defaultOptions: VerifyAuthChainHeadersOptions) {
 export function wellKnownComponents(
   options: Options
 ): w.IHttpServerComponent.IRequestHandler<
-  w.IHttpServerComponent.PathAwareContext<
-    { verification?: DecentralandSignatureData },
-    string
-  >
+  w.IHttpServerComponent.PathAwareContext<DecentralandSignatureContext, string>
 > {
   return async (ctx, next) => {
     try {

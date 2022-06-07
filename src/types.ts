@@ -16,6 +16,14 @@ export type DecentralandSignatureData<P extends {} = {}> = {
   authMetadata: P
 }
 
+export type DecentralandSignatureContext<P extends {} = {}> = {
+  verification?: DecentralandSignatureData<P>
+}
+
+export type DecentralandSignatureRequiredContext<P extends {} = {}> = {
+  verification: DecentralandSignatureData<P>
+}
+
 export type VerifyAuthChainHeadersOptions = {
   catalyst?: string
   expiration?: number

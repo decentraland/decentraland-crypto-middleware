@@ -78,13 +78,13 @@ import type { IHttpServerComponent } from '@well-known-components/interfaces'
 import * as dcl from 'decentraland-crypto-middleware'
 
 app.use('/user/required', dcl.wellKnownComponents())
-app.get('/user/required', (ctx: { verification: dcl.DecentralandSignatureData<{}> }) => {
+app.get('/user/required', (ctx: dcl.DecentralandSignatureRequiredContext) => {
   const address: string = ctx.verification.auth
   const metadata: Record<string, any> = ctx.verification.authMetadata
 })
 
 app.use('/user/optional', dcl.wellKnownComponents({ optional: true })
-app.get('/user/optional', (ctx: { verification?: Partial<dcl.DecentralandSignatureData<{}>> }) => {
+app.get('/user/optional', (ctx: dcl.DecentralandSignatureContext<{}>) => {
   const address: string | undefined= ctx.verification?.auth
   const metadata: Record<string, any> | undefined = ctx.verification?.authMetadata
 })
