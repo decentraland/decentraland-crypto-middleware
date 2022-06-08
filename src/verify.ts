@@ -1,29 +1,16 @@
-import { AuthChain, AuthLinkType } from 'dcl-crypto/dist/types'
-import { Authenticator } from 'dcl-crypto/dist/Authenticator'
+import { AuthChain } from '@dcl/crypto/dist/types'
+import { Authenticator } from '@dcl/crypto/dist/Authenticator'
 import {
   AUTH_CHAIN_HEADER_PREFIX,
   AUTH_METADATA_HEADER,
   AUTH_TIMESTAMP_HEADER,
   DecentralandSignatureData,
-  DEFAULT_CATALYST,
   DEFAULT_EXPIRATION,
+  DEFAULT_PROVIDER_URL,
   VerifyAuthChainHeadersOptions,
 } from './types'
 import RequestError from './errors'
-import 'isomorphic-fetch'
-
-export function isEIP1664AuthChain(authChain: AuthChain) {
-  switch (authChain.length) {
-    case 2:
-    case 3:
-      return (
-        authChain[0].type === AuthLinkType.SIGNER &&
-        authChain[1].type === AuthLinkType.ECDSA_EIP_1654_EPHEMERAL
-      )
-    default:
-      return false
-  }
-}
+import { HTTPProvider } from 'eth-connect'
 
 export function extractAuthChain(
   headers: Record<string, string | string[] | undefined>
@@ -68,66 +55,25 @@ export async function verifyPersonalSign(
   return Authenticator.ownerAddress(authChain).toLowerCase()
 }
 
-export async function verifyEIP1654Sign(
+export async function verifySignature(
   authChain: AuthChain,
   payload: string,
-  options: Pick<VerifyAuthChainHeadersOptions, 'catalyst'> = {}
+  options: VerifyAuthChainHeadersOptions = {}
 ) {
-  const catalyst = new URL(options.catalyst ?? DEFAULT_CATALYST)
-  const ownerAddress = Authenticator.ownerAddress(authChain).toLowerCase()
-  let response: Response
-  let verification: { ownerAddress: string; valid: boolean }
+  const provider =
+    options.ethereumProvider || new HTTPProvider(DEFAULT_PROVIDER_URL)
 
-  try {
-    response = await fetch(
-      `https://${catalyst.host}/lambdas/crypto/validate-signature`,
-      {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'accept-type': 'application/json',
-        },
-        body: JSON.stringify({ authChain, timestamp: payload }),
-      }
-    )
-  } catch (err) {
-    throw new RequestError(
-      `Error connecting to catalyst "https://${catalyst.host}"`,
-      503
-    )
+  const verification = await Authenticator.validateSignature(
+    payload,
+    authChain,
+    provider
+  )
+
+  if (!verification.ok) {
+    throw new RequestError(`Invalid signature: ${verification.message}`, 401)
   }
 
-  let body = ''
-  try {
-    body = await response!.text()
-    verification = JSON.parse(body)
-  } catch (err) {
-    throw new RequestError(
-      `Invalid response from catalyst "https://${catalyst.host}": ${body}`,
-      503
-    )
-  }
-
-  if (
-    !verification.valid ||
-    verification.ownerAddress.toLowerCase() !== ownerAddress
-  ) {
-    throw new RequestError(`Invalid signature`, 401)
-  }
-
-  return ownerAddress
-}
-
-export function verifySign(
-  authChain: AuthChain,
-  payload: string,
-  options: Pick<VerifyAuthChainHeadersOptions, 'catalyst'> = {}
-) {
-  if (isEIP1664AuthChain(authChain)) {
-    return verifyEIP1654Sign(authChain, payload, options)
-  }
-
-  return verifyPersonalSign(authChain, payload)
+  return Authenticator.ownerAddress(authChain).toLowerCase()
 }
 
 export function verifyTimestamp(value?: string | string[]) {
@@ -184,7 +130,7 @@ export default async function verify<P extends {} = {}>(
     headers[AUTH_TIMESTAMP_HEADER],
     headers[AUTH_METADATA_HEADER]
   )
-  const ownerAddress = await verifySign(authChain, payload, options)
+  const ownerAddress = await verifySignature(authChain, payload, options)
   await verifyExpiration(timestamp)
 
   return {

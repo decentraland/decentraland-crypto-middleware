@@ -1,5 +1,5 @@
-import { Authenticator } from 'dcl-crypto'
-import { AuthChain, AuthIdentity, AuthLinkType } from 'dcl-crypto/dist/types'
+import { Authenticator } from '@dcl/crypto'
+import { AuthIdentity, AuthLinkType } from '@dcl/crypto/dist/types'
 import createAuthChainHeaders from './createAuthChainHeader'
 import {
   AUTH_CHAIN_HEADER_PREFIX,
@@ -7,10 +7,10 @@ import {
   AUTH_TIMESTAMP_HEADER,
 } from './types'
 import verifyAuthChainHeaders, {
-  isEIP1664AuthChain,
-  verifyEIP1654Sign,
   verifyPersonalSign,
+  verifySignature,
 } from './verify'
+import { HTTPProvider } from 'eth-connect'
 
 const identity: AuthIdentity = {
   ephemeralIdentity: {
@@ -36,44 +36,12 @@ const identity: AuthIdentity = {
   ],
 }
 
-const authChainEIP1664: AuthChain = [
-  {
-    type: AuthLinkType.SIGNER,
-    payload: '',
-    signature: '',
-  },
-  {
-    type: AuthLinkType.ECDSA_EIP_1654_EPHEMERAL,
-    payload: ``,
-    signature: '',
-  },
-  {
-    type: AuthLinkType.ECDSA_EIP_1654_SIGNED_ENTITY,
-    payload: ``,
-    signature: '',
-  },
-]
-
 describe(`src/verifyAuthChainHeaders`, () => {
-  describe(`isEIP1664AuthChain`, () => {
-    test(`should return true if the  Auth Chain is a EIP 1654`, () => {
-      expect(isEIP1664AuthChain(authChainEIP1664)).toBe(true)
-    })
-
-    test(`should return false if the Auth Chain is not  a EIP 1654`, () => {
-      expect(isEIP1664AuthChain(identity.authChain)).toBe(false)
-    })
-
-    test(`should return false if the Auth Chain is invalud`, () => {
-      expect(isEIP1664AuthChain([])).toBe(false)
-    })
-  })
-
   describe(`verifyEIP1654Sign`, () => {
     test(`should return the owner address of the sign`, async () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
-      expect(await verifyEIP1654Sign(chain, payload)).toBe(
+      expect(await verifySignature(chain, payload)).toBe(
         identity.authChain[0].payload.toLowerCase()
       )
     })
@@ -82,15 +50,17 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
       expect(
-        await verifyEIP1654Sign(chain, payload, {
-          catalyst: 'https://peer.decentraland.zone',
+        await verifySignature(chain, payload, {
+          ethereumProvider: new HTTPProvider(
+            'https://rpc.decentraland.org/ropsten'
+          ),
         })
       ).toBe(identity.authChain[0].payload.toLowerCase())
     })
 
     test(`should throw an error with an invalid signature`, async () => {
       const payload = '0123456789'
-      await expect(() => verifyEIP1654Sign([], payload)).rejects.toThrowError(
+      await expect(() => verifySignature([], payload)).rejects.toThrowError(
         'Invalid signature'
       )
     })
@@ -99,8 +69,8 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
       await expect(() =>
-        verifyEIP1654Sign(chain, payload, {
-          catalyst: 'https://no-peer.decentraland.zone',
+        verifySignature(chain, payload, {
+          ethereumProvider: new HTTPProvider('https://ping.decentraland.org'),
         })
       ).rejects.toThrowError('Error connecting to catalyst')
     })
@@ -109,7 +79,9 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
       await expect(() =>
-        verifyEIP1654Sign(chain, payload, { catalyst: 'https://httpbin.org/' })
+        verifySignature(chain, payload, {
+          ethereumProvider: new HTTPProvider('https://ping.decentraland.org'),
+        })
       ).rejects.toThrowError('Invalid response from catalyst')
     })
   })

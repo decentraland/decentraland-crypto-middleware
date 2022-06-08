@@ -45,7 +45,7 @@
   },
   "homepage": "https://github.com/decentraland/decentraland-crypto-middleware#readme",
   "dependencies": {
-    "dcl-crypto": "^2.3.0",
+    "@dcl/crypto": "^3.0.0",
     "isomorphic-fetch": "^3.0.0",
     "passport-strategy": "^1.0.0"
   },
