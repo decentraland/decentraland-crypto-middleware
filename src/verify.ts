@@ -131,7 +131,7 @@ export default async function verify<P extends {} = {}>(
     headers[AUTH_METADATA_HEADER]
   )
   const ownerAddress = await verifySignature(authChain, payload, options)
-  await verifyExpiration(timestamp)
+  await verifyExpiration(timestamp, options)
 
   return {
     auth: ownerAddress,
