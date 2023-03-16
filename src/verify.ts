@@ -1,3 +1,4 @@
+import { request, RequestOptions } from 'https'
 import { AuthChain, AuthLinkType } from 'dcl-crypto/dist/types'
 import { Authenticator } from 'dcl-crypto/dist/Authenticator'
 import {
@@ -10,7 +11,6 @@ import {
   VerifyAuthChainHeadersOptions,
 } from './types'
 import RequestError from './errors'
-import 'isomorphic-fetch'
 
 export function isEIP1664AuthChain(authChain: AuthChain) {
   switch (authChain.length) {
@@ -75,38 +75,53 @@ export async function verifyEIP1654Sign(
 ) {
   const catalyst = new URL(options.catalyst ?? DEFAULT_CATALYST)
   const ownerAddress = Authenticator.ownerAddress(authChain).toLowerCase()
-  let response: Response
-  let verification: { ownerAddress: string; valid: boolean }
-
-  try {
-    response = await fetch(
-      `https://${catalyst.host}/lambdas/crypto/validate-signature`,
-      {
+  const verification: { ownerAddress: string; valid: boolean } =
+    await new Promise((resolve, reject) => {
+      const body = JSON.stringify({ authChain, timestamp: payload })
+      const options: RequestOptions = {
         method: 'POST',
+        port: 443,
+        hostname: catalyst.host,
+        path: '/lambdas/crypto/validate-signature',
         headers: {
-          'content-type': 'application/json',
           'accept-type': 'application/json',
+          'content-type': 'application/json',
+          'content-length': Buffer.byteLength(body),
         },
-        body: JSON.stringify({ authChain, timestamp: payload }),
       }
-    )
-  } catch (err) {
-    throw new RequestError(
-      `Error connecting to catalyst "https://${catalyst.host}"`,
-      503
-    )
-  }
+      const req = request(options, (res) => {
+        let json = ''
+        res.setEncoding('utf-8')
+        res.on('data', (chunk: string) => {
+          json += chunk
+        })
+        res.on('end', () => {
+          try {
+            const verification = JSON.parse(json)
+            resolve(verification)
+          } catch (err) {
+            reject(
+              new RequestError(
+                `Invalid response from catalyst "https://${catalyst.host}": ${json}`,
+                503
+              )
+            )
+          }
+        })
+      })
 
-  let body = ''
-  try {
-    body = await response!.text()
-    verification = JSON.parse(body)
-  } catch (err) {
-    throw new RequestError(
-      `Invalid response from catalyst "https://${catalyst.host}": ${body}`,
-      503
-    )
-  }
+      req.on('error', (err) => {
+        reject(
+          new RequestError(
+            `Error connecting to catalyst "https://${catalyst.host}": ${err.message}`,
+            503
+          )
+        )
+      })
+
+      req.write(body)
+      req.end()
+    })
 
   if (
     !verification.valid ||
