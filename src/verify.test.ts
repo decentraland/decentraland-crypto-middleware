@@ -5,6 +5,7 @@ import {
   AUTH_CHAIN_HEADER_PREFIX,
   AUTH_METADATA_HEADER,
   AUTH_TIMESTAMP_HEADER,
+  DEFAULT_EXPIRATION,
 } from './types'
 import verifyAuthChainHeaders, {
   isEIP1664AuthChain,
@@ -191,6 +192,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
 
     test(`should throw an error if timestamp is expired`, async () => {
       const timestamp = 0
+      const now = Date.now()
       const metadata = {}
       const method = 'get'
       const path = '/path/to/resource'
@@ -199,10 +201,15 @@ describe(`src/verifyAuthChainHeaders`, () => {
         .toLowerCase()
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, metadata)
+      jest.spyOn(Date, 'now').mockReturnValue(now)
 
       await expect(() =>
         verifyAuthChainHeaders(method, path, headers)
-      ).rejects.toThrowError('Expired signature')
+      ).rejects.toThrowError(
+        `Expired signature: signature timestamp: ${timestamp}, timestamp expiration: ${
+          timestamp + DEFAULT_EXPIRATION
+        }, local timestamp: ${now}`
+      )
     })
 
     test(`should throw an error if timestamp header wasn't signed`, async () => {
