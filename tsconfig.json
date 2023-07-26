@@ -1,14 +1,18 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
+    "outDir": "./dist",
     "module": "commonjs",
-    "target": "es5",
-    "lib": ["es5", "es6", "es7", "es2017", "dom"],
+    "target": "ES2020",
+    "declaration": true, /* Generates corresponding '.d.ts' file. */
+    "declarationMap": true, /* Generates a sourcemap for each corresponding '.d.ts' file. */
+    "sourceMap": true, /* Generates corresponding '.map' file. */
+    "types": [
+      "node"
+    ],
     "sourceMap": true,
     "allowJs": false,
-    "jsx": "react",
+    "strict": true,
     "moduleResolution": "node",
-    "rootDirs": ["src", "stories"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -16,13 +20,11 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "downlevelIteration": true,
-    "esModuleInterop": true,
-    "typeRoots": ["node_modules/@types", "src/@types"]
+    "esModuleInterop": true
   },
   "include": ["src/**/*"]
 }

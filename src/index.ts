@@ -4,11 +4,23 @@ import {
   DecentralandSignatureData,
   DEFAULT_ERROR_FORMAT,
   DecentralandSignatureContext,
-  DecentralandSignatureRequiredContext
+  DecentralandSignatureRequiredContext,
+  AUTH_CHAIN_HEADER_PREFIX,
+  AUTH_TIMESTAMP_HEADER,
+  AUTH_METADATA_HEADER
 } from './types'
 import verify from './verify'
 
-export { Options, DecentralandSignatureData, DecentralandSignatureContext, DecentralandSignatureRequiredContext }
+export {
+  Options,
+  DecentralandSignatureData,
+  DecentralandSignatureContext,
+  DecentralandSignatureRequiredContext,
+  AUTH_CHAIN_HEADER_PREFIX,
+  AUTH_TIMESTAMP_HEADER,
+  AUTH_METADATA_HEADER,
+  verify
+}
 /**
  * Well Known Components
  */
@@ -22,7 +34,7 @@ export function wellKnownComponents(
       const data = await verify(ctx.request.method, ctx.url.pathname, ctx.request.headers.raw(), options)
 
       ctx.verification = data
-    } catch (err) {
+    } catch (err: any) {
       if (!options.optional) {
         const onError = options.onError ?? DEFAULT_ERROR_FORMAT
         const status = err.statusCode || err.status || 500

@@ -30,7 +30,7 @@ export function extractAuthChain(headers: Record<string, string | string[] | und
         : (headers[AUTH_CHAIN_HEADER_PREFIX + index] as string)
 
       chain.push(JSON.parse(item))
-    } catch (err) {
+    } catch (err: any) {
       throw new RequestError(`Invalid chain format: ${err.message}`, 400)
     }
 
