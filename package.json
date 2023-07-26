@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/decentraland/decentraland-crypto-middleware.git"
+    "url": "git+https://github.com/decentraland/platform-crypto-middleware.git"
   },
   "prettier": {
     "printWidth": 120,
@@ -28,9 +28,9 @@
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/decentraland/decentraland-crypto-middleware/issues"
+    "url": "https://github.com/decentraland/platform-crypto-middleware/issues"
   },
-  "homepage": "https://github.com/decentraland/decentraland-crypto-middleware#readme",
+  "homepage": "https://github.com/decentraland/platfom-crypto-middleware#readme",
   "dependencies": {
     "@dcl/crypto": "^3.4.3",
     "@well-known-components/fetch-component": "^2.0.2",
