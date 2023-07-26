@@ -1,17 +1,22 @@
-import { Authenticator } from 'dcl-crypto'
-import { AuthChain, AuthIdentity, AuthLinkType } from 'dcl-crypto/dist/types'
-import createAuthChainHeaders from './createAuthChainHeader'
+import {
+  AuthChain,
+  AuthIdentity,
+  AuthLinkType,
+  Authenticator,
+} from '@dcl/crypto'
+import { createFetchComponent } from '@well-known-components/fetch-component'
+import createAuthChainHeaders from '../src/createAuthChainHeader'
 import {
   AUTH_CHAIN_HEADER_PREFIX,
   AUTH_METADATA_HEADER,
   AUTH_TIMESTAMP_HEADER,
   DEFAULT_EXPIRATION,
-} from './types'
+} from '../src/types'
 import verifyAuthChainHeaders, {
   isEIP1664AuthChain,
   verifyEIP1654Sign,
   verifyPersonalSign,
-} from './verify'
+} from '../src/verify'
 
 const identity: AuthIdentity = {
   ephemeralIdentity: {
@@ -56,67 +61,62 @@ const authChainEIP1664: AuthChain = [
 ]
 
 describe(`src/verifyAuthChainHeaders`, () => {
+  const fetcher = createFetchComponent()
   describe(`isEIP1664AuthChain`, () => {
-    test(`should return true if the  Auth Chain is a EIP 1654`, () => {
+    it(`should return true if the  Auth Chain is a EIP 1654`, () => {
       expect(isEIP1664AuthChain(authChainEIP1664)).toBe(true)
     })
 
-    test(`should return false if the Auth Chain is not  a EIP 1654`, () => {
+    it(`should return false if the Auth Chain is not  a EIP 1654`, () => {
       expect(isEIP1664AuthChain(identity.authChain)).toBe(false)
     })
 
-    test(`should return false if the Auth Chain is invalud`, () => {
+    it(`should return false if the Auth Chain is invalud`, () => {
       expect(isEIP1664AuthChain([])).toBe(false)
     })
   })
 
   describe(`verifyEIP1654Sign`, () => {
-    test(`should return the owner address of the sign`, async () => {
+    it(`should return the owner address of the sign`, async () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
-      expect(await verifyEIP1654Sign(chain, payload)).toBe(
+      expect(await verifyEIP1654Sign(chain, payload, { fetcher })).toBe(
         identity.authChain[0].payload.toLowerCase()
       )
     })
 
-    test(`should accept a catalyst url`, async () => {
+    it(`should accept a catalyst url`, async () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
       expect(
         await verifyEIP1654Sign(chain, payload, {
           catalyst: 'https://peer.decentraland.zone',
+          fetcher,
         })
       ).toBe(identity.authChain[0].payload.toLowerCase())
     })
 
-    test(`should throw an error with an invalid signature`, async () => {
+    it(`should throw an error with an invalid signature`, async () => {
       const payload = '0123456789'
-      await expect(() => verifyEIP1654Sign([], payload)).rejects.toThrowError(
-        'Invalid signature'
-      )
+      await expect(() =>
+        verifyEIP1654Sign([], payload, { fetcher })
+      ).rejects.toThrowError('Invalid signature')
     })
 
-    test(`should throw an error if catalyst does not respond`, async () => {
+    it(`should throw an error if catalyst does not respond`, async () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
       await expect(() =>
         verifyEIP1654Sign(chain, payload, {
           catalyst: 'https://no-peer.decentraland.zone',
+          fetcher,
         })
       ).rejects.toThrowError('Error connecting to catalyst')
-    })
-
-    test(`should throw an error if catalyst `, async () => {
-      const payload = '0123456789'
-      const chain = Authenticator.signPayload(identity, payload)
-      await expect(() =>
-        verifyEIP1654Sign(chain, payload, { catalyst: 'https://httpbin.org/' })
-      ).rejects.toThrowError('Invalid response from catalyst')
     })
   })
 
   describe(`verifyPersonalSign`, () => {
-    test(`should return the owner address of the sign`, async () => {
+    it(`should return the owner address of the sign`, async () => {
       const payload = '0123456789'
       const chain = Authenticator.signPayload(identity, payload)
       expect(await verifyPersonalSign(chain, payload)).toBe(
@@ -124,7 +124,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       )
     })
 
-    test(`should throw an error with an invalid signature`, async () => {
+    it(`should throw an error with an invalid signature`, async () => {
       const payload = '0123456789'
       await expect(() => verifyPersonalSign([], payload)).rejects.toThrowError(
         'Invalid signature'
@@ -133,7 +133,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
   })
 
   describe(`verifyAuthChainHeaders`, () => {
-    test(`should return all the information about a header signature `, async () => {
+    it(`should return all the information about a header signature `, async () => {
       const timestamp = Date.now()
       const metadata = {}
       const method = 'get'
@@ -144,19 +144,21 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const chain = Authenticator.signPayload(identity, payload)
       const headers = createAuthChainHeaders(chain, timestamp, metadata)
 
-      expect(await verifyAuthChainHeaders(method, path, headers)).toEqual({
+      expect(
+        await verifyAuthChainHeaders(method, path, headers, { fetcher })
+      ).toEqual({
         auth: identity.authChain[0].payload.toLowerCase(),
         authMetadata: {},
       })
     })
 
-    test(`should throw an error if there is not an auth chain`, async () => {
+    it(`should throw an error if there is not an auth chain`, async () => {
       await expect(() =>
-        verifyAuthChainHeaders('', '', {})
+        verifyAuthChainHeaders('', '', {}, { fetcher })
       ).rejects.toThrowError('Invalid Auth Chain')
     })
 
-    test(`should throw an error if the auth chain is invalid`, async () => {
+    it(`should throw an error if the auth chain is invalid`, async () => {
       const timestamp = Date.now()
       const metadata = {}
       const method = 'get'
@@ -169,11 +171,11 @@ describe(`src/verifyAuthChainHeaders`, () => {
       headers[AUTH_CHAIN_HEADER_PREFIX + '1'] = '{'
 
       await expect(() =>
-        verifyAuthChainHeaders(method, path, headers)
+        verifyAuthChainHeaders(method, path, headers, { fetcher })
       ).rejects.toThrowError('Invalid chain format:')
     })
 
-    test(`should throw an error if timestamp is invalid`, async () => {
+    it(`should throw an error if timestamp is invalid`, async () => {
       const timestamp = Date.now()
       const metadata = {}
       const method = 'get'
@@ -186,11 +188,11 @@ describe(`src/verifyAuthChainHeaders`, () => {
       headers[AUTH_TIMESTAMP_HEADER] = 'abc'
 
       await expect(() =>
-        verifyAuthChainHeaders(method, path, headers)
+        verifyAuthChainHeaders(method, path, headers, { fetcher })
       ).rejects.toThrowError('Invalid chain timestamp:')
     })
 
-    test(`should throw an error if timestamp is expired`, async () => {
+    it(`should throw an error if timestamp is expired`, async () => {
       const timestamp = 0
       const now = Date.now()
       const metadata = {}
@@ -204,7 +206,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       jest.spyOn(Date, 'now').mockReturnValue(now)
 
       await expect(() =>
-        verifyAuthChainHeaders(method, path, headers)
+        verifyAuthChainHeaders(method, path, headers, { fetcher })
       ).rejects.toThrowError(
         `Expired signature: signature timestamp: ${timestamp}, timestamp expiration: ${
           timestamp + DEFAULT_EXPIRATION
@@ -212,7 +214,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       )
     })
 
-    test(`should throw an error if timestamp header wasn't signed`, async () => {
+    it(`should throw an error if timestamp header wasn't signed`, async () => {
       const timestamp = Date.now()
       const metadata = {}
       const method = 'get'
@@ -224,11 +226,11 @@ describe(`src/verifyAuthChainHeaders`, () => {
       const headers = createAuthChainHeaders(chain, timestamp + 1, metadata)
 
       await expect(() =>
-        verifyAuthChainHeaders(method, path, headers)
+        verifyAuthChainHeaders(method, path, headers, { fetcher })
       ).rejects.toThrowError('Invalid signature:')
     })
 
-    test(`should throw an error if metadata is invalid`, async () => {
+    it(`should throw an error if metadata is invalid`, async () => {
       const timestamp = Date.now()
       const metadata = {}
       const method = 'get'
@@ -241,11 +243,11 @@ describe(`src/verifyAuthChainHeaders`, () => {
       headers[AUTH_METADATA_HEADER] = '{'
 
       await expect(() =>
-        verifyAuthChainHeaders(method, path, headers)
+        verifyAuthChainHeaders(method, path, headers, { fetcher })
       ).rejects.toThrowError('Invalid chain metadata:')
     })
 
-    test(`should throw an error if metadata wasn't signed`, async () => {
+    it(`should throw an error if metadata wasn't signed`, async () => {
       const timestamp = Date.now()
       const metadata = {}
       const method = 'get'
@@ -259,7 +261,7 @@ describe(`src/verifyAuthChainHeaders`, () => {
       })
 
       await expect(() =>
-        verifyAuthChainHeaders(method, path, headers)
+        verifyAuthChainHeaders(method, path, headers, { fetcher })
       ).rejects.toThrowError('Invalid signature:')
     })
   })

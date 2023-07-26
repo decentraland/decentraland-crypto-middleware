@@ -4,37 +4,18 @@
   "description": "Decentraland Authentication Middleware",
   "main": "./lib",
   "scripts": {
-    "test": "jest",
-    "build": "rm -rf lib && tsc -p . -outDir lib --sourceMap false --skipLibCheck",
-    "verify": "ts-node bin/verify.ts",
-    "format": "prettier --write '**/*.{ts,js,json,md}'",
-    "semantic-release": "semantic-release",
-    "husky-setup": "husky install",
-    "precommit": "lint-staged --config .husky/pre-commit.js"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "roots": [
-      "<rootDir>/src/"
-    ],
-    "moduleNameMapper": {
-      "\\.(css|less|sass|scss|gif|ttf|eot|svg)$": "<rootDir>/src/__mocks__/files.ts"
-    }
-  },
-  "release": {
-    "branches": [
-      "main"
-    ]
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -p tsconfig.json --watch",
+    "lint:check": "eslint '**/*.{js,ts}'",
+    "lint:fix": "eslint '**/*.{js,ts}' --fix",
+    "test": "jest --forceExit --detectOpenHandles --verbose",
+    "test:coverage": "jest --forceExit --detectOpenHandles --coverage --verbose"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/decentraland/decentraland-crypto-middleware.git"
   },
   "keywords": [
-    "express",
-    "koa",
-    "passport",
-    "connect",
     "middleware",
     "well-known-components"
   ],
@@ -45,29 +26,14 @@
   },
   "homepage": "https://github.com/decentraland/decentraland-crypto-middleware#readme",
   "dependencies": {
-    "dcl-crypto": "^2.3.0",
-    "isomorphic-fetch": "^3.0.0",
-    "passport-strategy": "^1.0.0"
+    "@dcl/crypto": "^3.4.3",
+    "@well-known-components/fetch-component": "^2.0.2",
+    "@well-known-components/interfaces": "^1.4.2"
   },
   "devDependencies": {
-    "@types/express": "^4.17.13",
-    "@types/isomorphic-fetch": "0.0.35",
-    "@types/jest": "^27.0.2",
-    "@types/koa": "^2.13.4",
-    "@types/passport-strategy": "^0.2.35",
-    "@well-known-components/interfaces": "^1.1.0",
+    "@dcl/eslint-config": "^1.1.8",
+    "@well-known-components/test-helpers": "^1.5.3",
     "colors": "^1.4.0",
-    "express": "^4.17.1",
-    "husky": "^7.0.2",
-    "jest": "^27.2.4",
-    "koa": "^2.13.3",
-    "lint-staged": "^11.2.0",
-    "prettier": "^2.4.1",
-    "semantic-release": "^17.4.7",
-    "ts-jest": "^27.0.5",
-    "ts-loader": "^9.2.6",
-    "ts-node": "^10.2.1",
-    "tsc-files": "^1.1.2",
     "typescript": "^4.4.3"
   }
 }

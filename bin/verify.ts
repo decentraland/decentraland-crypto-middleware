@@ -1,4 +1,4 @@
-import { AuthChain, AuthLinkType } from 'dcl-crypto'
+import { AuthChain, AuthLinkType } from '@dcl/crypto'
 import { red, gray, green, blue } from 'colors/safe'
 import {
   verifyTimestamp,

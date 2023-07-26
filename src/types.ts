@@ -1,3 +1,4 @@
+import { IFetchComponent } from '@well-known-components/interfaces'
 import RequestError from './errors'
 
 export const AUTH_CHAIN_HEADER_PREFIX = 'x-identity-auth-chain-'
@@ -27,6 +28,7 @@ export type DecentralandSignatureRequiredContext<P extends {} = {}> = {
 export type VerifyAuthChainHeadersOptions = {
   catalyst?: string
   expiration?: number
+  fetcher: IFetchComponent
 }
 
 export type SessionOptions = {

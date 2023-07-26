@@ -1,4 +1,4 @@
-import { AuthChain } from 'dcl-crypto/dist/types'
+import { AuthChain } from '@dcl/crypto'
 import {
   AUTH_CHAIN_HEADER_PREFIX,
   AUTH_METADATA_HEADER,

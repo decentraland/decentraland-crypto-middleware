@@ -1,5 +1,4 @@
-import { AuthChain, AuthLinkType } from 'dcl-crypto/dist/types'
-import { Authenticator } from 'dcl-crypto/dist/Authenticator'
+import { Authenticator, AuthChain, AuthLinkType } from '@dcl/crypto'
 import {
   AUTH_CHAIN_HEADER_PREFIX,
   AUTH_METADATA_HEADER,
@@ -10,7 +9,6 @@ import {
   VerifyAuthChainHeadersOptions,
 } from './types'
 import RequestError from './errors'
-import 'isomorphic-fetch'
 
 export function isEIP1664AuthChain(authChain: AuthChain) {
   switch (authChain.length) {
@@ -71,15 +69,15 @@ export async function verifyPersonalSign(
 export async function verifyEIP1654Sign(
   authChain: AuthChain,
   payload: string,
-  options: Pick<VerifyAuthChainHeadersOptions, 'catalyst'> = {}
+  options: Pick<VerifyAuthChainHeadersOptions, 'catalyst' | 'fetcher'>
 ) {
   const catalyst = new URL(options.catalyst ?? DEFAULT_CATALYST)
   const ownerAddress = Authenticator.ownerAddress(authChain).toLowerCase()
-  let response: Response
   let verification: { ownerAddress: string; valid: boolean }
 
+  let response
   try {
-    response = await fetch(
+    response = await options.fetcher.fetch(
       `https://${catalyst.host}/lambdas/crypto/validate-signature`,
       {
         method: 'POST',
@@ -90,7 +88,7 @@ export async function verifyEIP1654Sign(
         body: JSON.stringify({ authChain, timestamp: payload }),
       }
     )
-  } catch (err) {
+  } catch (err: any) {
     throw new RequestError(
       `Error connecting to catalyst "https://${catalyst.host}"`,
       503
@@ -101,7 +99,7 @@ export async function verifyEIP1654Sign(
   try {
     body = await response!.text()
     verification = JSON.parse(body)
-  } catch (err) {
+  } catch (err: any) {
     throw new RequestError(
       `Invalid response from catalyst "https://${catalyst.host}": ${body}`,
       503
@@ -121,7 +119,7 @@ export async function verifyEIP1654Sign(
 export function verifySign(
   authChain: AuthChain,
   payload: string,
-  options: Pick<VerifyAuthChainHeadersOptions, 'catalyst'> = {}
+  options: Pick<VerifyAuthChainHeadersOptions, 'catalyst' | 'fetcher'>
 ) {
   if (isEIP1664AuthChain(authChain)) {
     return verifyEIP1654Sign(authChain, payload, options)
@@ -149,7 +147,7 @@ export function verifyMetadata(value?: string | string[]): Record<string, any> {
 
 export function verifyExpiration(
   timestamp: number,
-  options: VerifyAuthChainHeadersOptions = {}
+  options: VerifyAuthChainHeadersOptions
 ) {
   const expiration = options.expiration ?? DEFAULT_EXPIRATION
   const now = Date.now()
@@ -178,7 +176,7 @@ export default async function verify<P extends {} = {}>(
   method: string,
   path: string,
   headers: Record<string, string | string[] | undefined>,
-  options: VerifyAuthChainHeadersOptions = {}
+  options: VerifyAuthChainHeadersOptions
 ): Promise<DecentralandSignatureData<P>> {
   const authChain = extractAuthChain(headers)
   const timestamp = verifyTimestamp(headers[AUTH_TIMESTAMP_HEADER])
@@ -191,7 +189,7 @@ export default async function verify<P extends {} = {}>(
     headers[AUTH_METADATA_HEADER]
   )
   const ownerAddress = await verifySign(authChain, payload, options)
-  await verifyExpiration(timestamp, options)
+  verifyExpiration(timestamp, options)
 
   return {
     auth: ownerAddress,
