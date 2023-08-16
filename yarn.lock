@@ -302,11 +302,11 @@
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
 "@dcl/crypto@^3.4.3":
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/@dcl/crypto/-/crypto-3.4.3.tgz#74f55aed699949bc2566a7b0d6a23de499019afe"
-  integrity sha512-biG8PqImY3jtVM5bPizgAD0P6X9/7VMxKuD2hxiEEeZClfB1Zi76Qk8pHaLpJ5pU3B+NogwZ8xoREhq0Po+gXQ==
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/@dcl/crypto/-/crypto-3.4.4.tgz#43a3ab68bce0be2ddcd72440f940b06098ca3f82"
+  integrity sha512-bXYPM+hh/AuNU7S2LgHDHv021mAjguwkjLvwO8XBKQRRIoZMxwH+EXizxeUpCLsf/oArjEp3cM0BnP29xV+IYQ==
   dependencies:
-    "@dcl/schemas" "^8.2.0"
+    "@dcl/schemas" "^9.2.0"
     eth-connect "^6.0.3"
     ethereum-cryptography "^1.0.3"
 
@@ -327,10 +327,10 @@
     eslint-plugin-prettier "^4.2.1"
     prettier "^2.8.8"
 
-"@dcl/schemas@^8.2.0":
-  version "8.2.2"
-  resolved "https://registry.yarnpkg.com/@dcl/schemas/-/schemas-8.2.2.tgz#31b3697ec517d4a5a6958bddf046441a969b8056"
-  integrity sha512-IZqcT1YOKxw5XWs6LW6Uw+7Ue5vHCVERPMwefAdt26jW1OTH818od0rBc1tQzzfBTwsrAvbgFJvpbZedieu00g==
+"@dcl/schemas@^9.2.0":
+  version "9.2.0"
+  resolved "https://registry.yarnpkg.com/@dcl/schemas/-/schemas-9.2.0.tgz#ee77e6194d485ae897a2d9c36180935c381182d3"
+  integrity sha512-OGjjfbL+JsTqphvc6Msl4a5kYCGJlq2LmAMBY9WDlYRE+9DZBE2Sin+ebekYWBmSUA75mJHO+qUpg0/FC8z+oQ==
   dependencies:
     ajv "^8.11.0"
     ajv-errors "^3.0.0"
