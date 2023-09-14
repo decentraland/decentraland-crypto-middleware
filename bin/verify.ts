@@ -1,5 +1,5 @@
-import { AuthChain, AuthLinkType } from 'dcl-crypto'
-import { red, gray, green, blue } from 'colors/safe'
+import { AuthChain, AuthLinkType } from '@dcl/crypto'
+import chalk from 'chalk'
 import {
   verifyTimestamp,
   verifyMetadata,
@@ -15,15 +15,15 @@ class Logger {
   constructor(public prefix: string = '') {}
 
   skip(message: string, ...extra: any[]) {
-    this.items.push([this.prefix + gray(`❔ ${message}`), ...extra])
+    this.items.push([this.prefix + chalk.gray(`❔ ${message}`), ...extra])
   }
 
   ok(message: string, ...extra: any[]) {
-    this.items.push([this.prefix + green(`✅ ${message}`), ...extra])
+    this.items.push([this.prefix + chalk.green(`✅ ${message}`), ...extra])
   }
 
   error(message: string, ...extra: any[]) {
-    this.items.push([this.prefix + red(`❌ ${message}:`), ...extra])
+    this.items.push([this.prefix + chalk.red(`❌ ${message}:`), ...extra])
   }
 
   flush() {
@@ -56,7 +56,7 @@ async function step<F extends (logger: Logger) => Record<string, any>>(
     return result as any
   } catch (err) {
     failed = true
-    logger.error(name, blue(err.message))
+    logger.error(name, chalk.blue(err.message))
     logger.flush()
     l.flush()
     return {} as any
@@ -107,7 +107,7 @@ Promise.resolve().then(async () => {
         'patch',
       ]
       if (methods.includes(method)) {
-        logger.ok(`http method: ${blue(method)}`)
+        logger.ok(`http method: ${chalk.blue(method)}`)
       } else {
         logger.error(
           `Invalud chain method: "${method}" (expected: "${methods.join(
@@ -118,7 +118,7 @@ Promise.resolve().then(async () => {
       }
 
       if (pathname.startsWith('/')) {
-        logger.ok(`http pathname: ${blue(pathname)}`)
+        logger.ok(`http pathname: ${chalk.blue(pathname)}`)
       } else {
         logger.error(
           `Invalid chain pathname: "${pathname}", (expected: /${pathname})`
@@ -129,7 +129,7 @@ Promise.resolve().then(async () => {
       let timestamp: number = 0
       try {
         timestamp = verifyTimestamp(rawTimestamp)
-        logger.ok(`timestamp: ${blue(String(timestamp))}`)
+        logger.ok(`timestamp: ${chalk.blue(String(timestamp))}`)
       } catch (err) {
         logger.error(err.message)
         isValidPayload = false
@@ -138,7 +138,7 @@ Promise.resolve().then(async () => {
       let metadata: any
       try {
         metadata = verifyMetadata(rawMetadata)
-        logger.ok(`metadata: ${blue(rawMetadata)}`)
+        logger.ok(`metadata: ${chalk.blue(rawMetadata)}`)
       } catch (err) {
         logger.error(err.message)
         isValidPayload = false
@@ -160,7 +160,7 @@ Promise.resolve().then(async () => {
       JSON.stringify(metadata)
     )
     const ownerAddress = await verifySign(authChain, payload)
-    logger.ok(`ownerAddress: ${blue(ownerAddress)}`)
+    logger.ok(`ownerAddress: ${chalk.blue(ownerAddress)}`)
     return { ownerAddress }
   })
 

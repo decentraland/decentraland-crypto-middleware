@@ -1,5 +1,5 @@
-import { AuthChain, AuthLinkType } from 'dcl-crypto/dist/types'
-import { Authenticator } from 'dcl-crypto/dist/Authenticator'
+import { AuthChain, AuthLinkType } from '@dcl/crypto/dist/types'
+import { Authenticator } from '@dcl/crypto/dist/Authenticator'
 import {
   AUTH_CHAIN_HEADER_PREFIX,
   AUTH_METADATA_HEADER,
@@ -10,7 +10,7 @@ import {
   VerifyAuthChainHeadersOptions,
 } from './types'
 import RequestError from './errors'
-import 'isomorphic-fetch'
+import { fetch, Response } from 'undici'
 
 export function isEIP1664AuthChain(authChain: AuthChain) {
   switch (authChain.length) {
