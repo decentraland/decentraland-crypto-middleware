@@ -10,7 +10,7 @@ import {
   VerifyAuthChainHeadersOptions,
 } from './types'
 import RequestError from './errors'
-import { fetch, Response } from 'undici'
+import fetch, { Response } from 'node-fetch'
 
 export function isEIP1664AuthChain(authChain: AuthChain) {
   switch (authChain.length) {
