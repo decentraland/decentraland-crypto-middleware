@@ -105,3 +105,4 @@ dist
 
 # Compiled files
 lib/
+.DS_Store
