@@ -24,9 +24,12 @@ export type DecentralandSignatureRequiredContext<P extends {} = {}> = {
   verification: DecentralandSignatureData<P>
 }
 
-export type VerifyAuthChainHeadersOptions = {
+export type VerifyAuthChainHeadersOptions<
+  P extends Record<string, any> = Record<string, any>
+> = {
   catalyst?: string
   expiration?: number
+  verifyMetadataContent?: (authMetadata: P | undefined) => boolean
 }
 
 export type SessionOptions = {
@@ -34,4 +37,5 @@ export type SessionOptions = {
   onError?: (err: RequestError) => any
 }
 
-export type Options = VerifyAuthChainHeadersOptions & SessionOptions
+export type Options<P extends Record<string, any> = Record<string, any>> =
+  VerifyAuthChainHeadersOptions<P> & SessionOptions

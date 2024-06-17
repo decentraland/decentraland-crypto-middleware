@@ -7,11 +7,13 @@ import {
   AUTH_TIMESTAMP_HEADER,
   DEFAULT_EXPIRATION,
 } from './types'
+
 import verifyAuthChainHeaders, {
   isEIP1664AuthChain,
   verifyEIP1654Sign,
   verifyPersonalSign,
 } from './verify'
+import RequestError from './errors'
 
 const identity: AuthIdentity = {
   ephemeralIdentity: {
@@ -261,6 +263,75 @@ describe(`src/verifyAuthChainHeaders`, () => {
       await expect(() =>
         verifyAuthChainHeaders(method, path, headers)
       ).rejects.toThrowError('Invalid signature:')
+    })
+
+    describe('when verifyMetadataContent function is defined', () => {
+      describe('and the verification returns true', () => {
+        test('should return all the information about a header signature', async () => {
+          const timestamp = Date.now()
+          const metadata = { signer: 'a signer' }
+          const method = 'get'
+          const path = '/path/to/resource'
+          const payload = [method, path, timestamp, JSON.stringify(metadata)]
+            .join(':')
+            .toLowerCase()
+          const chain = Authenticator.signPayload(identity, payload)
+          const headers = createAuthChainHeaders(chain, timestamp, metadata)
+          const options = { verifyMetadataContent: () => true }
+
+          expect(
+            await verifyAuthChainHeaders(method, path, headers, options)
+          ).toEqual({
+            auth: identity.authChain[0].payload.toLowerCase(),
+            authMetadata: metadata,
+          })
+        })
+      })
+
+      describe('and the verification returns false', () => {
+        test('should throw an error indicating the metadata is invalid', async () => {
+          const timestamp = Date.now()
+          const metadata = { signer: 'a signer' }
+          const method = 'get'
+          const path = '/path/to/resource'
+          const payload = [method, path, timestamp, JSON.stringify(metadata)]
+            .join(':')
+            .toLowerCase()
+          const chain = Authenticator.signPayload(identity, payload)
+          const headers = createAuthChainHeaders(chain, timestamp, metadata)
+          const options = { verifyMetadataContent: () => false }
+
+          await expect(() =>
+            verifyAuthChainHeaders(method, path, headers, options)
+          ).rejects.toThrowError(
+            `Invalid metadata content: ${JSON.stringify(metadata)}`
+          )
+        })
+      })
+
+      describe('and the verification throws an error', () => {
+        test('should throw an error indicating the metadata is invalid', async () => {
+          const timestamp = Date.now()
+          const error = 'a custom error'
+          const metadata = { signer: 'a signer' }
+          const method = 'get'
+          const path = '/path/to/resource'
+          const payload = [method, path, timestamp, JSON.stringify(metadata)]
+            .join(':')
+            .toLowerCase()
+          const chain = Authenticator.signPayload(identity, payload)
+          const headers = createAuthChainHeaders(chain, timestamp, metadata)
+          const options = {
+            verifyMetadataContent: () => {
+              throw new RequestError(error, 400)
+            },
+          }
+
+          await expect(() =>
+            verifyAuthChainHeaders(method, path, headers, options)
+          ).rejects.toThrowError(error)
+        })
+      })
     })
   })
 })
