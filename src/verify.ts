@@ -193,6 +193,16 @@ export default async function verify<P extends {} = {}>(
   const ownerAddress = await verifySign(authChain, payload, options)
   await verifyExpiration(timestamp, options)
 
+  if (
+    options.verifyMetadataContent &&
+    !options.verifyMetadataContent(metadata)
+  ) {
+    throw new RequestError(
+      `Invalid metadata content: ${JSON.stringify(metadata)}`,
+      400
+    )
+  }
+
   return {
     auth: ownerAddress,
     authMetadata: metadata as P,
